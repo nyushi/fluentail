@@ -3,6 +3,8 @@ fluentail
 
 Receives UDP packets from [udp_stream](https://bitbucket.org/winebarrel/fluent-plugin-udp-stream) plugin and displays to standard output in JSON format
 
+[ ![Download](https://api.bintray.com/packages/nyushi/fluentail/fluentail/images/download.png) ](https://bintray.com/nyushi/fluentail/fluentail/_latestVersion)
+
 build
 -----
 
@@ -14,19 +16,18 @@ go build
 usage
 -----
 
-1. setup udp_stream in `fluentd`
+### setup `udp_stream` in `fluentd`
 
 ```
 <match any_tag.**>
   type udp_stream
   host <target_host>
-  port <target_port>
 </match>
 ```
 
-1. run `fluentail`
+### run `fluentail`
 
 ```
-user@target_host$ fluentail -l <target_port>
-user@target_host$ fluentail -l <target_port> | jq .
+user@<target_host>$ fluentail
+user@<target_host>$ fluentail | jq .
 ```
