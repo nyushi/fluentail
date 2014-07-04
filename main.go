@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"regexp"
+	"text/template"
 	"time"
 
 	"github.com/ugorji/go/codec"
@@ -80,13 +82,19 @@ func main() {
 		listenPortFlag int
 		tagRegexpFlag  string
 		remoteAddrFlag string
+		formatFlag     string
 	)
 	flag.IntVar(&listenPortFlag, "l", 25000, "udp port for listen.")
 	flag.StringVar(&tagRegexpFlag, "t", ".*", "filter regexp for tag. (e.g. 'warning$')")
 	flag.StringVar(&remoteAddrFlag, "r", "", "filter string for remote addr. (e.g. '127.0.0.1')")
+	flag.StringVar(&formatFlag, "format", "", "output format by go template.")
 	flag.Parse()
 
+	var outputFormat *template.Template
 	tagFilter := regexp.MustCompile(tagRegexpFlag)
+	if formatFlag != "" {
+		outputFormat = template.Must(template.New("output-format").Parse(formatFlag))
+	}
 
 	var buf []byte
 	buf = make([]byte, 65507)
@@ -115,6 +123,12 @@ func main() {
 		}
 
 		decoded["remote"] = fmt.Sprintf("%s:%d", remote.IP, remote.Port)
+
+		if outputFormat != nil {
+			outputFormat.Execute(os.Stdout, decoded)
+			fmt.Println()
+			continue
+		}
 
 		b, err := json.Marshal(decoded)
 		if err != nil {
