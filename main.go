@@ -14,6 +14,11 @@ import (
 	"github.com/ugorji/go/codec"
 )
 
+var (
+	Version   string
+	GitCommit string
+)
+
 func bytes2string(i interface{}) interface{} {
 	switch v := i.(type) {
 	case map[string]interface{}:
@@ -83,12 +88,19 @@ func main() {
 		tagRegexpFlag  string
 		remoteAddrFlag string
 		formatFlag     string
+		versionFlag    bool
 	)
+	flag.BoolVar(&versionFlag, "v", false, "print version information.")
 	flag.IntVar(&listenPortFlag, "l", 25000, "udp port for listen.")
 	flag.StringVar(&tagRegexpFlag, "t", ".*", "filter regexp for tag. (e.g. 'warning$')")
 	flag.StringVar(&remoteAddrFlag, "r", "", "filter string for remote addr. (e.g. '127.0.0.1')")
 	flag.StringVar(&formatFlag, "format", "", "output format by go template.")
 	flag.Parse()
+
+	if versionFlag {
+		fmt.Printf("%s(%s)\n", Version, GitCommit)
+		os.Exit(0)
+	}
 
 	var outputFormat *template.Template
 	tagFilter := regexp.MustCompile(tagRegexpFlag)
